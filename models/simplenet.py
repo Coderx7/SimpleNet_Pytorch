@@ -144,7 +144,7 @@ class simplenet(nn.Module):
           if isinstance(m, nn.Conv2d):
             nn.init.xavier_uniform_(m.weight.data, gain=nn.init.calculate_gain('relu'))
 
-          return model
+        return model
 
 
     # def _make_layers(self, cfg):
