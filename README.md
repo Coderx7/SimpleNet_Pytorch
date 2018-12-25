@@ -37,7 +37,7 @@ The original Caffe implementation can be found here : [Original Caffe implementa
 | DSN                          |      1M      |     92.03     |    65.43     |
 | Max-out NIN                  |      \-      |     93.25     |    71.14     |
 | LSUV                         |     N/A      |     94.16     |     N/A      |
-| SimpleNet                    |    5.48M     |   **95.32**   | **77.83**    |
+| SimpleNet                    |    5.48M     |   **95.51**   | **78.37**    |
 
 
 
