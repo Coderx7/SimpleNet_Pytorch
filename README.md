@@ -19,7 +19,7 @@ The original Caffe implementation can be found here : [Original Caffe implementa
 | Dataset | Accuracy |
 |------------|----------|
 | CIFAR10    | **95.51**    |
-| CIFAR100   | **77.83**   |
+| CIFAR100   | **78.37**   |
 
 ### CIFAR10/100 top results (2016): 
 
