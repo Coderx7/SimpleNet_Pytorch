@@ -140,7 +140,7 @@ class simplenet(nn.Module):
 
                             )
 
-        for m in self.modules():
+        for m in model.modules():
           if isinstance(m, nn.Conv2d):
             nn.init.xavier_uniform_(m.weight.data, gain=nn.init.calculate_gain('relu'))
 
