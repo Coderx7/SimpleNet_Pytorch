@@ -41,7 +41,6 @@ class simplenet(nn.Module):
                     name, own_state[name].size(), param.size()))
 
     def forward(self, x):
-        #print(x.size())
         out = self.features(x)
 
         #Global Max Pooling
