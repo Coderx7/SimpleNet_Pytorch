@@ -15,6 +15,7 @@ class simplenet(nn.Module):
         #print(simpnet_name)
         self.features = self._make_layers() #self._make_layers(cfg[simpnet_name])
         self.classifier = nn.Linear(256, classes)
+        self.drp = nn.Dropout(0.1)
 
     def load_my_state_dict(self, state_dict):
 
@@ -45,7 +46,8 @@ class simplenet(nn.Module):
 
         #Global Max Pooling
         out = F.max_pool2d(out, kernel_size=out.size()[2:]) 
-        out = F.dropout2d(out, 0.1, training=True)
+        # out = F.dropout2d(out, 0.1, training=True)
+        out = self.drp(out)
 
         out = out.view(out.size(0), -1)
         out = self.classifier(out)
