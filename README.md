@@ -27,17 +27,17 @@ The original Caffe implementation can be found here : [Original Caffe implementa
 
 | **Method**                   | **\#Params** |  **ImageNet** | **ImageNet-Real-Labels**  |
 | :--------------------------- | :----------: | :-----------: | :-----------: |  
-| SimpleNetV1_imagenet         |     5.7m     | 71.14/89.75   | 78.49/93.24   |         
-| SimpleNetV1_imagenet         |     1.5m     | 61.39/83.36   | 69.07/88.01   |  
+| SimpleNetV1_imagenet(23 MB)   |     5.7m     | 71.14/89.75   | 78.49/93.24   |         
+| SimpleNetV1_imagenet(6 MB)    |     1.5m     | 61.39/83.36   | 69.07/88.01   |  
    
 
-After nearly 7 years I could finally get my hands on a good GPU(RTX3080) and train the model on imagenet!      
+-- After nearly 7 years I could finally get my hands on a good GPU(RTX3080) and train the model on imagenet!      
 I used [rwightman/pytorch-image-models](https://github.com/rwightman/pytorch-image-models) repository to train the models. He did a great job!   
 I'll be updating the whole repository in the upcomming days inshaalah!   
 SimpleNet performs very decently, it outperforms VGGNet, ResNet and even some variants of MobileNets(1-3)   
 and its fast, very fast! (based on the model up to 2x faster).   
 
-
+-- The models can be found in [imagenet models directory](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/ImageNet%20models).
 
 
 #### CIFAR10/100 Results achieved using this implementation :
