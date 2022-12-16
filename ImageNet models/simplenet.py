@@ -9,7 +9,7 @@ import torch.nn.functional as F
 
 
 class SimpleNet(nn.Module):
-    def __init__(self, classes=1000, scale=1.0, network_idx=0, mode=1, drop_rates={}):
+    def __init__(self, classes=1000, scale=1.0, network_idx=0, mode=2, drop_rates={}):
         super(SimpleNet, self).__init__()
        
         self.cfg = {
@@ -94,7 +94,7 @@ class SimpleNet(nn.Module):
         return model  
 
 if __name__ == '__main__':
-     simplenet = SimpleNet(classes=1000, scale=1.0, network_idx=0, mode=1)
+     simplenet = SimpleNet(classes=1000, scale=1.0, network_idx=0, mode=2)
      input_dummy = torch.randn(size=(5,3,224,224))
      out = simplenet(input_dummy)
      print(f'output: {out.size()}')
