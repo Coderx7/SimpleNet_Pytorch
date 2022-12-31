@@ -38,7 +38,7 @@ I'll be updating the whole repository in the upcomming days inshaalah!
 SimpleNet performs very decently, it outperforms VGGNet, ResNet and even some variants of MobileNets(1-3)   
 and its fast, very fast! (based on the model up to 2x faster).   
 
--- The models can be found in [imagenet models directory](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/ImageNet%20models).
+-- The models(pytorch, onnx, jit) can be found in [imagenet models directory](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/ImageNet%20models).
 
 
 #### CIFAR10/100 Results achieved using this implementation :
