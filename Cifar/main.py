@@ -1,5 +1,5 @@
 # original coder : https://github.com/D-X-Y/ResNeXt-DenseNet
-# added simpnet model 
+# added simplenet model 
 from __future__ import division
 
 import os, sys, pdb, shutil, time, random, datetime
@@ -11,7 +11,7 @@ import torchvision.datasets as dset
 import torchvision.transforms as transforms
 from utils import AverageMeter, RecorderMeter, time_string, convert_secs2time
 import models
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 
 model_names = sorted(name for name in models.__dict__
   if name.islower() and not name.startswith("__")
@@ -21,7 +21,7 @@ model_names = sorted(name for name in models.__dict__
 parser = argparse.ArgumentParser(description='Trains ResNeXt on CIFAR or ImageNet', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 parser.add_argument('data_path', type=str, help='Path to dataset')
 parser.add_argument('--dataset', type=str, choices=['cifar10', 'cifar100', 'imagenet', 'svhn', 'stl10'], help='Choose between Cifar10/100 and ImageNet.')
-parser.add_argument('--arch', metavar='ARCH', default='resnet18', choices=model_names, help='model architecture: ' + ' | '.join(model_names) + ' (default: resnext29_8_64)')
+parser.add_argument('--arch', metavar='ARCH', default='simplenet_cifar_5m', choices=model_names, help='model architecture: ' + ' | '.join(model_names) + ' (default: resnext29_8_64)')
 # Optimization options
 parser.add_argument('--epochs', type=int, default=700, help='Number of epochs to train.')
 parser.add_argument('--batch_size', type=int, default=64, help='Batch size.')
@@ -93,7 +93,6 @@ def main():
 
   writer = SummaryWriter()
 
-
   #   # Data transforms
   # mean = [0.5071, 0.4867, 0.4408]
   # std = [0.2675, 0.2565, 0.2761]
@@ -129,7 +128,7 @@ def main():
 
   print_log("=> creating model '{}'".format(args.arch), log)
   # Init model, criterion, and optimizer
-  net = models.__dict__[args.arch](num_classes)
+  net = models.__dict__[args.arch](num_classes=num_classes)
   #torch.save(net, 'net.pth')
   #init_net = torch.load('net.pth')
   #net.load_my_state_dict(init_net.state_dict())
@@ -187,14 +186,9 @@ def main():
 
   for epoch in range(args.start_epoch, args.epochs):
     #current_learning_rate = adjust_learning_rate(optimizer, epoch, args.gammas, args.schedule)
-    current_learning_rate = float(scheduler.get_lr()[-1])
-    #print('lr:',current_learning_rate)
-
-    scheduler.step()
-
-    #adjust_learning_rate(optimizer, epoch)
-
-
+    current_learning_rate = float(scheduler.get_last_lr()[-1])
+    # print('lr:',current_learning_rate)
+    
     need_hour, need_mins, need_secs = convert_secs2time(epoch_time.avg * (args.epochs-epoch))
     need_time = '[Need: {:02d}:{:02d}:{:02d}]'.format(need_hour, need_mins, need_secs)
 
@@ -203,6 +197,9 @@ def main():
 
     # train for one epoch
     train_acc, train_los = train(train_loader, net, criterion, optimizer, epoch, log)
+
+    scheduler.step()
+    #adjust_learning_rate(optimizer, epoch)
 
     # evaluate on validation set
     #val_acc,   val_los   = extract_features(test_loader, net, criterion, log)
@@ -250,7 +247,7 @@ def train(train_loader, model, criterion, optimizer, epoch, log):
     data_time.update(time.time() - end)
 
     if args.use_cuda:
-      target = target.cuda(async=True)
+      target = target.cuda()
       input = input.cuda()
     input_var = torch.autograd.Variable(input)
     target_var = torch.autograd.Variable(target)
@@ -261,9 +258,9 @@ def train(train_loader, model, criterion, optimizer, epoch, log):
 
     # measure accuracy and record loss
     prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
-    losses.update(loss.data[0], input.size(0))
-    top1.update(prec1[0], input.size(0))
-    top5.update(prec5[0], input.size(0))
+    losses.update(loss.item(), input.size(0))
+    top1.update(prec1.item(), input.size(0))
+    top5.update(prec5.item(), input.size(0))
 
     # compute gradient and do SGD step
     optimizer.zero_grad()
@@ -293,23 +290,21 @@ def validate(val_loader, model, criterion, log):
 
   # switch to evaluate mode
   model.eval()
+  with torch.no_grad():
+    for i, (input, target) in enumerate(val_loader):
+      if args.use_cuda:
+        target = target.cuda()
+        input = input.cuda()
 
-  for i, (input, target) in enumerate(val_loader):
-    if args.use_cuda:
-      target = target.cuda(async=True)
-      input = input.cuda()
-    input_var = torch.autograd.Variable(input, volatile=True)
-    target_var = torch.autograd.Variable(target, volatile=True)
+      # compute output
+      output = model(input)
+      loss = criterion(output, target)
 
-    # compute output
-    output = model(input_var)
-    loss = criterion(output, target_var)
-
-    # measure accuracy and record loss
-    prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
-    losses.update(loss.data[0], input.size(0))
-    top1.update(prec1[0], input.size(0))
-    top5.update(prec5[0], input.size(0))
+      # measure accuracy and record loss
+      prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
+      losses.update(loss.data.item(), input.size(0))
+      top1.update(prec1.item(), input.size(0))
+      top5.update(prec5.item(), input.size(0))
 
   print_log('  **Test** Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f} Error@1 {error1:.3f}'.format(top1=top1, top5=top5, error1=100-top1.avg), log)
 
@@ -322,26 +317,24 @@ def extract_features(val_loader, model, criterion, log):
 
   # switch to evaluate mode
   model.eval()
+  with torch.no_grad():
+    for i, (input, target) in enumerate(val_loader):
+      if args.use_cuda:
+        target = target.cuda()
+        input = input.cuda()
 
-  for i, (input, target) in enumerate(val_loader):
-    if args.use_cuda:
-      target = target.cuda(async=True)
-      input = input.cuda()
-    input_var = torch.autograd.Variable(input, volatile=True)
-    target_var = torch.autograd.Variable(target, volatile=True)
+      # compute output
+      output, features = model([input])
 
-    # compute output
-    output, features = model([input_var])
+      pdb.set_trace()
 
-    pdb.set_trace()
+      loss = criterion(output, target)
 
-    loss = criterion(output, target_var)
-
-    # measure accuracy and record loss
-    prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
-    losses.update(loss.data[0], input.size(0))
-    top1.update(prec1[0], input.size(0))
-    top5.update(prec5[0], input.size(0))
+      # measure accuracy and record loss
+      prec1, prec5 = accuracy(output.data, target, topk=(1, 5))
+      losses.update(loss.data.item(), input.size(0))
+      top1.update(prec1.item(), input.size(0))
+      top5.update(prec5.item(), input.size(0))
 
   print_log('  **Test** Prec@1 {top1.avg:.3f} Prec@5 {top5.avg:.3f} Error@1 {error1:.3f}'.format(top1=top1, top5=top5, error1=100-top1.avg), log)
 
@@ -389,11 +382,11 @@ def accuracy(output, target, topk=(1,)):
 
   _, pred = output.topk(maxk, 1, True, True)
   pred = pred.t()
-  correct = pred.eq(target.view(1, -1).expand_as(pred))
+  correct = pred.eq(target.reshape(1, -1).expand_as(pred))
 
   res = []
   for k in topk:
-    correct_k = correct[:k].view(-1).float().sum(0)
+    correct_k = correct[:k].reshape(-1).float().sum(0)
     res.append(correct_k.mul_(100.0 / batch_size))
   return res
 
