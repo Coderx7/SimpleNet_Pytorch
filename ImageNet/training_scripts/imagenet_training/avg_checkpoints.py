@@ -17,6 +17,7 @@ import os
 import glob
 import hashlib
 from timm.models.helpers import load_state_dict
+from validate import validate
 
 parser = argparse.ArgumentParser(description='PyTorch Checkpoint Averager')
 parser.add_argument('--input', default='', type=str, metavar='PATH', help='path to base input folder containing checkpoints')
@@ -25,7 +26,7 @@ parser.add_argument('--output', default='./averaged.pth', type=str, metavar='PAT
 parser.add_argument('--no-use-ema', dest='no_use_ema', action='store_true', help='Force not using ema version of weights (if present)')
 parser.add_argument('--no-sort', dest='no_sort', action='store_true', help='Do not sort and select by checkpoint metric, also makes "n" argument irrelevant')
 parser.add_argument('-n', type=int, default=10, metavar='N', help='Number of checkpoints to average')
-
+parser.add_argument('--avg_weights', default='', type=str, metavar='PATH',help='avg fmodel filepath')
 
 def checkpoint_metric(checkpoint_path):
     if not checkpoint_path or not os.path.isfile(checkpoint_path):
@@ -50,24 +51,38 @@ def main():
     args.sort = not args.no_sort
 
     if os.path.exists(args.output):
-        print("Error: Output filename ({}) already exists.".format(args.output))
-        exit(1)
+        with open(args.output, 'rb') as f:
+            sha_hash = hashlib.sha256(f.read()).hexdigest()
+        print(f'{args.output}')
+        name,ext = os.path.splitext(args.output)
+        new_name = f'{name}_{str(sha_hash)[-10:]}{ext}'
+        os.rename(args.output, new_name)
+        print(f'renamed "{args.output}" to "{new_name}"')
 
     pattern = args.input
     if not args.input.endswith(os.path.sep) and not args.filter.startswith(os.path.sep):
         pattern += os.path.sep
     pattern += args.filter
     checkpoints = glob.glob(pattern, recursive=True)
-
+    print(f'checkpoints: {checkpoints}')
+    
     if args.sort:
         checkpoint_metrics = []
         for c in checkpoints:
             metric = checkpoint_metric(c)
             if metric is not None:
                 checkpoint_metrics.append((metric, c))
+                
+        if args.avg_weights:
+            if os.path.exists(args.avg_weights):
+                checkpoint = torch.load(args.avg_weights, map_location='cpu')
+                acc = float(args.avg_weights.split('_')[-1].split('.pth')[0])
+                checkpoint_metrics.append((acc, args.avg_weights))
+            else:
+                print(f'FILE DOESNT EXIST!')
         checkpoint_metrics = list(sorted(checkpoint_metrics))
         checkpoint_metrics = checkpoint_metrics[-args.n:]
-        print("Selected checkpoints:")
+        print(f"Selected checkpoints:'({len(checkpoint_metrics)})'")
         [print(m, c) for m, c in checkpoint_metrics]
         avg_checkpoints = [c for m, c in checkpoint_metrics]
     else:
