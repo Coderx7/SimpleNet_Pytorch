@@ -7,7 +7,7 @@ import torch
 from timm.models import create_model
 from timm.data import resolve_data_config
 from timm.data.transforms_factory import create_transform
-
+import torchvision
 
 parser = argparse.ArgumentParser(description='PyTorch ImageNet Inference')
 parser.add_argument('--model', '-m', metavar='MODEL', default='simpnet', help='model architecture (default: simpnet)')
@@ -31,10 +31,10 @@ model = create_model(
     mode = args.netmode,
     )
 
-print('Restoring model state from checkpoint...')
-model_weights = torch.load(args.weights, map_location='cpu')
-model.load_state_dict(model_weights)
-model.eval()
+# print('Restoring model state from checkpoint...')
+# model_weights = torch.load(args.weights, map_location='cpu')
+# model.load_state_dict(model_weights)
+# model.eval()
 
 if args.jit:
     dummy_input = torch.randn(1, 3, 224, 224, device="cpu")
@@ -47,6 +47,8 @@ transform = create_transform(**config)
 filename = "./misc_files/dog.jpg"
 img = Image.open(filename).convert('RGB')
 tensor = transform(img).unsqueeze(0)
+# save the transformed image for visualization or testing the ported models
+torchvision.utils.save_image(tensor.squeeze(0),'img_test_transformed.jpg')
 
 with torch.no_grad():
     out = model(tensor)
