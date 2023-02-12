@@ -309,7 +309,7 @@ class SimpleNet(nn.Module):
                         nn.Conv2d(input_channel, filters, kernel_size=kernel_size, stride=stride, padding=1),
                         nn.BatchNorm2d(filters, eps=1e-05, momentum=0.05, affine=True),
                         nn.ReLU(inplace=True),
-                        nn.Dropout2d(p=custom_dropout, inplace=True),
+                        nn.Dropout2d(p=custom_dropout, inplace=False),
                     ]
 
                 input_channel = filters
