@@ -4,4 +4,4 @@ architecture:
 """
 
 
-from .simplenet import simplenet
+from .simplenet import simplenet_cifar_310k, simplenet_cifar_460k, simplenet_cifar_5m, simplenet_cifar_5m_extra_pool, SimpleNet
