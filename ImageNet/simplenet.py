@@ -63,28 +63,28 @@ def _cfg(url="", **kwargs):
 
 default_cfgs: Dict[str, Dict[str, Any]] = {
     "simplenetv1_small_m1_05": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_1.5m_m1-aa831f69.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_small_m1_05-a7ec600b.pth"
     ),
     "simplenetv1_small_m2_05": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_1.5m_m2-39b8bcfc.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_small_m2_05-62617ea1.pth"
     ),
     "simplenetv1_small_m1_075": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_3m_m1-b96ceb62.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_small_m1_075-8427bf60.pth"
     ),
     "simplenetv1_small_m2_075": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_3m_m2-56d12da5.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_small_m2_075-da714eb5.pth"
     ),
     "simplenetv1_5m_m1": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_5m_m1-295289f0.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_5m_m1-cc6b3ad1.pth"
     ),
     "simplenetv1_5m_m2": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_5m_m2-324ba7cc.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_5m_m2-c35297bf.pth"
     ),
     "simplenetv1_m1_9m": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_9m_m1-00000000.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_9m_m1-8c98a0a5.pth"
     ),
     "simplenetv1_m2_9m": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_9m_m2-00000000.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_9m_m2-6b01be1e.pth"
     ),
 }
 
@@ -257,12 +257,12 @@ class SimpleNet(nn.Module):
         self.in_chans = in_chans
         self.scale = scale
         self.networks = [
-            "simplenetv1_imagenet",     # 0
+            "simplenetv1_imagenet",  # 0
             "simplenetv1_imagenet_9m",  # 1
             # other archs
-            "simplenet_cifar_310k",     # 2
-            "simplenet_cifar_460k",     # 3
-            "simplenet_cifar_5m",       # 4
+            "simplenet_cifar_310k",  # 2
+            "simplenet_cifar_460k",  # 3
+            "simplenet_cifar_5m",  # 4
             "simplenet_cifar_5m_extra_pool",  # 5
         ]
         self.network_idx = network_idx

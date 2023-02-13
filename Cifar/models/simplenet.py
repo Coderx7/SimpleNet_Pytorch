@@ -36,7 +36,7 @@ __all__ = [
     "simplenet_cifar_310k",
     "simplenet_cifar_460k",
     "simplenet_cifar_5m",
-    "simplenet_cifar_5m_extra_pool",    # refers to the early pytorch impl of cifar10/100 that mistakenly used an extra pooling(see issue #5)
+    "simplenet_cifar_5m_extra_pool",  # refers to the early pytorch impl of cifar10/100 that mistakenly used an extra pooling(see issue #5)
     "simplenetv1_small_m1_05",  # 1.5m
     "simplenetv1_small_m2_05",  # 1.5m
     "simplenetv1_small_m1_075",  # 3m
@@ -63,28 +63,28 @@ def _cfg(url="", **kwargs):
 
 default_cfgs: Dict[str, Dict[str, Any]] = {
     "simplenetv1_small_m1_05": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_1.5m_m1-aa831f69.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_small_m1_05-a7ec600b.pth"
     ),
     "simplenetv1_small_m2_05": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_1.5m_m2-39b8bcfc.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_small_m2_05-62617ea1.pth"
     ),
     "simplenetv1_small_m1_075": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_3m_m1-b96ceb62.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_small_m1_075-8427bf60.pth"
     ),
     "simplenetv1_small_m2_075": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_3m_m2-56d12da5.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_small_m2_075-da714eb5.pth"
     ),
     "simplenetv1_5m_m1": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_5m_m1-295289f0.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_5m_m1-cc6b3ad1.pth"
     ),
     "simplenetv1_5m_m2": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_5m_m2-324ba7cc.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_5m_m2-c35297bf.pth"
     ),
     "simplenetv1_m1_9m": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_9m_m1-00000000.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_9m_m1-8c98a0a5.pth"
     ),
     "simplenetv1_m2_9m": _cfg(
-        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_9m_m2-00000000.pth"
+        url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_9m_m2-6b01be1e.pth"
     ),
 }
 
@@ -107,15 +107,21 @@ class SimpleNet(nn.Module):
     ):
         """Instantiates a SimpleNet model. SimpleNet is comprised of the most basic building blocks of a CNN architecture.
         It uses basic principles to maximize the network performance both in terms of feature representation and speed without
-        resorting to complex design or operators.
+        resorting to complex design or operators. 
         
         Args:
             num_classes (int, optional): number of classes. Defaults to 1000.
             in_chans (int, optional): number of input channels. Defaults to 3.
             scale (float, optional): scale of the architecture width. Defaults to 1.0.
             network_idx (int, optional): the network index indicating the 5 million or 8 million version(0 and 1 respectively). Defaults to 0.
-            mode (int, optional): stride mode of the architecture. specifies how fast the input shrinks. 
-                you can choose between 0 and 4. (note for imagenet use 1-4). Defaults to 2.
+            mode (int, optional): stride mode of the architecture. specifies how fast the input shrinks.
+                This is used for larger input sizes such as the 224x224 in imagenet training where the
+                input size incurs a lot of overhead if not downsampled properly. 
+                you can choose between 0 meaning no change and 4. where each number denotes a specific
+                downsampling strategy. For imagenet use 1-4.
+                the larger the stride mode, the higher accuracy and the slower
+                the network gets. stride mode 1 is the fastest and achives very good accuracy.
+                Defaults to 2.
             drop_rates (Dict[int,float], optional): custom drop out rates specified per layer. 
                 each rate should be paired with the corrosponding layer index(pooling and cnn layers are counted only). Defaults to {}.
         """
@@ -123,115 +129,115 @@ class SimpleNet(nn.Module):
         # (channels or layer-type, stride=1, drp=0.)
         self.cfg: Dict[str, List[Tuple[Union(int, str), int, Union(float, None), Optional[str]]]] = {
             "simplenet_cifar_310k": [
-                (64, 1, .0),
-                (32, 1, .0),
-                (32, 1, .0),
+                (64, 1, 0.0),
+                (32, 1, 0.0),
+                (32, 1, 0.0),
                 (32, 1, None),
-                ("p", 2, .0),
-                (32, 1, .0),
-                (32, 1, .0),
+                ("p", 2, 0.0),
+                (32, 1, 0.0),
+                (32, 1, 0.0),
                 (64, 1, None),
-                ("p", 2, .0),
-                (64, 1, .0),
+                ("p", 2, 0.0),
+                (64, 1, 0.0),
                 (64, 1, None),
-                ("p", 2, .0),
-                (128, 1, .0),
-                (256, 1, .0, "k1"),
+                ("p", 2, 0.0),
+                (128, 1, 0.0),
+                (256, 1, 0.0, "k1"),
                 (64, 1, None, "k1"),
-                ("p", 2, .0),
+                ("p", 2, 0.0),
                 (64, 1, None),
             ],
             "simplenet_cifar_460k": [
-                (32, 1, .0),
-                (32, 1, .0),
-                (32, 1, .0),
+                (32, 1, 0.0),
+                (32, 1, 0.0),
+                (32, 1, 0.0),
                 (64, 1, None),
-                ("p", 2, .0),
-                (64, 1, .0),
-                (64, 1, .0),
+                ("p", 2, 0.0),
+                (64, 1, 0.0),
+                (64, 1, 0.0),
                 (64, 1, None),
-                ("p", 2, .0),
-                (64, 1, .0),
+                ("p", 2, 0.0),
+                (64, 1, 0.0),
                 (64, 1, None),
-                ("p", 2, .0),
-                (96, 1, .0),
-                (96, 1, .0, "k1"),
+                ("p", 2, 0.0),
+                (96, 1, 0.0),
+                (96, 1, 0.0, "k1"),
                 (96, 1, None, "k1"),
-                ("p", 2, .0),
+                ("p", 2, 0.0),
                 (100, 1, None),
             ],
             "simplenet_cifar_5m": [
-                (64, 1, .0),
-                (128, 1, .0),
-                (128, 1, .0),
+                (64, 1, 0.0),
+                (128, 1, 0.0),
+                (128, 1, 0.0),
                 (128, 1, None),
-                ("p", 2, .0),
-                (128, 1, .0),
-                (128, 1, .0),
+                ("p", 2, 0.0),
+                (128, 1, 0.0),
+                (128, 1, 0.0),
                 (256, 1, None),
-                ("p", 2, .0),
-                (256, 1, .0),
+                ("p", 2, 0.0),
+                (256, 1, 0.0),
                 (256, 1, None),
-                ("p", 2, .0),
-                (512, 1, .0),
-                (2048, 1, .0, "k1"),
+                ("p", 2, 0.0),
+                (512, 1, 0.0),
+                (2048, 1, 0.0, "k1"),
                 (256, 1, None, "k1"),
-                ("p", 2, .0),
+                ("p", 2, 0.0),
                 (256, 1, None),
             ],
             "simplenet_cifar_5m_extra_pool": [
-                (64, 1, .0),
-                (128, 1, .0),
-                (128, 1, .0),
+                (64, 1, 0.0),
+                (128, 1, 0.0),
+                (128, 1, 0.0),
                 (128, 1, None),
-                ("p", 2, .0),
-                (128, 1, .0),
-                (128, 1, .0),
+                ("p", 2, 0.0),
+                (128, 1, 0.0),
+                (128, 1, 0.0),
                 (256, 1, None),
-                ("p", 2, .0),
-                (256, 1, .0),
+                ("p", 2, 0.0),
+                (256, 1, 0.0),
                 (256, 1, None),
-                ("p", 2, .0),
-                (512, 1, .0),
-                ("p", 2, .0),   #extra pooling!
-                (2048, 1, .0, "k1"),
+                ("p", 2, 0.0),
+                (512, 1, 0.0),
+                ("p", 2, 0.0),  # extra pooling!
+                (2048, 1, 0.0, "k1"),
                 (256, 1, None, "k1"),
-                ("p", 2, .0),
+                ("p", 2, 0.0),
                 (256, 1, None),
             ],
             "simplenetv1_imagenet": [
-                (64, 1, .0),
-                (128, 1, .0),
-                (128, 1, .0),
-                (128, 1, .0),
-                (128, 1, .0),
-                (128, 1, .0),
-                ("p", 2, .0),
-                (256, 1, .0),
-                (256, 1, .0),
-                (256, 1, .0),
-                (512, 1, .0),
-                ("p", 2, .0),
-                (2048, 1, .0, "k1"),
-                (256, 1, .0, "k1"),
-                (256, 1, .0),
+                (64, 1, 0.0),
+                (128, 1, 0.0),
+                (128, 1, 0.0),
+                (128, 1, 0.0),
+                (128, 1, 0.0),
+                (128, 1, 0.0),
+                ("p", 2, 0.0),
+                (256, 1, 0.0),
+                (256, 1, 0.0),
+                (256, 1, 0.0),
+                (512, 1, 0.0),
+                ("p", 2, 0.0),
+                (2048, 1, 0.0, "k1"),
+                (256, 1, 0.0, "k1"),
+                (256, 1, 0.0),
             ],
             "simplenetv1_imagenet_9m": [
-                (128, 1, .0),
-                (192, 1, .0),
-                (192, 1, .0),
-                (192, 1, .0),
-                (192, 1, .0),
-                (192, 1, .0),
-                ("p", 2, .0),
-                (320, 1, .0),
-                (320, 1, .0),
-                (320, 1, .0),
-                (640, 1, .0),
-                ("p", 2, .0),
-                (2560, 1, .0, "k1"),
-                (320, 1, .0, "k1"),
-                (320, 1, .0),
+                (128, 1, 0.0),
+                (192, 1, 0.0),
+                (192, 1, 0.0),
+                (192, 1, 0.0),
+                (192, 1, 0.0),
+                (192, 1, 0.0),
+                ("p", 2, 0.0),
+                (320, 1, 0.0),
+                (320, 1, 0.0),
+                (320, 1, 0.0),
+                (640, 1, 0.0),
+                ("p", 2, 0.0),
+                (2560, 1, 0.0, "k1"),
+                (320, 1, 0.0, "k1"),
+                (320, 1, 0.0),
             ],
         }
 
@@ -251,12 +257,13 @@ class SimpleNet(nn.Module):
         self.in_chans = in_chans
         self.scale = scale
         self.networks = [
-            "simplenet_cifar_310k",     # 0
-            "simplenet_cifar_460k",     # 1
-            "simplenet_cifar_5m",       # 2
-            "simplenet_cifar_5m_extra_pool",  #3
-            "simplenetv1_imagenet",     # 4
-            "simplenetv1_imagenet_9m",  # 5
+            "simplenetv1_imagenet",  # 0
+            "simplenetv1_imagenet_9m",  # 1
+            # other archs
+            "simplenet_cifar_310k",  # 2
+            "simplenet_cifar_460k",  # 3
+            "simplenet_cifar_5m",  # 4
+            "simplenet_cifar_5m_extra_pool",  # 5
         ]
         self.network_idx = network_idx
         self.mode = mode
@@ -286,7 +293,7 @@ class SimpleNet(nn.Module):
             custom_dropout = defaul_dropout_rate if custom_dropout is None else custom_dropout
             # dropout values must be strictly decimal. while 0 doesnt introduce any issues here
             # i.e. during training and inference, if you try to jit trace your model it will crash
-            # due to using 0 as dropout value(this applies up to 1.13.1) so here is an explicit 
+            # due to using 0 as dropout value(this applies up to 1.13.1) so here is an explicit
             # check to convert any possible integer value to its decimal counterpart.
             custom_dropout = None if custom_dropout is None else float(custom_dropout)
             kernel_size = 3 if layer_type == [] else 1
@@ -326,7 +333,7 @@ def _gen_simplenet(
     num_classes: int = 1000,
     in_chans: int = 3,
     scale: float = 1.0,
-    network_idx: int = 4,
+    network_idx: int = 0,
     mode: int = 2,
     pretrained: bool = False,
     drop_rates: Dict[int, float] = {},
@@ -349,19 +356,36 @@ def _gen_simplenet(
 
 
 def simplenet(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Generic simplenet model builder. by default it returns `simplenetv1_5m_m2` model
+    but specifying different arguments such as `netidx`, `scale` or `mode` will result in 
+    the corrosponding network variant. 
+    
+    when pretrained is specified, if the combination of settings resemble any known variants
+    specified in the `default_cfg`, their respective pretrained weights will be loaded, otherwise
+    an exception will be thrown denoting Unknown model variant being specified.  
+
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights only if the model is a known variant specified in default_cfg. Defaults to False.
+
+    Raises:
+        Exception: if pretrained is used with an unknown/custom model variant and exception is raised.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """
     num_classes = kwargs.get("num_classes", 1000)
     in_chans = kwargs.get("in_chans", 3)
     scale = kwargs.get("scale", 1.0)
-    network_idx = kwargs.get("network_idx", 4)
+    network_idx = kwargs.get("network_idx", 0)
     mode = kwargs.get("mode", 2)
     drop_rates = kwargs.get("drop_rates", {})
-    model_variant = "simplenetv1"
+    model_variant = "simplenetv1_5m_m2"
     if pretrained:
         # check if the model specified is a known variant
         model_base = None
-        if network_idx == 4:
+        if network_idx == 0:
             model_base = 5
-        elif network_idx == 5:
+        elif network_idx == 1:
             model_base = 9
         config = ""
         if math.isclose(scale, 1.0):
@@ -372,90 +396,181 @@ def simplenet(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
             config = f"small_m{mode}_05"
         else:
             config = f"m{mode}_{scale:.2f}".replace(".", "")
-
-        if network_idx == 0:
-            model_variant = f"simplenetv1_{config}"
-        else:
-            model_variant = f"simplenetv1_{config}"
+        model_variant = f"simplenetv1_{config}"
 
     return _gen_simplenet(model_variant, num_classes, in_chans, scale, network_idx, mode, pretrained, drop_rates)
+
+
+def remove_network_settings(kwargs: Dict[str, Any]) -> Dict[str, Any]:
+    """Removes network related settings passed in kwargs for predefined network configruations below
+
+    Returns:
+        Dict[str,Any]: cleaned kwargs
+    """
+    model_args = {k: v for k, v in kwargs.items() if k not in ["scale", "network_idx", "mode"]}
+    return model_args
 
 
 # cifar10/100 models
 def simplenet_cifar_310k(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
     """original implementation of smaller variants of simplenet for cifar10/100 
     that were used in the paper 
-    """    
+    """
     model_variant = "simplenet_cifar_310k"
-    return _gen_simplenet(model_variant, network_idx=0, mode=0, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, network_idx=2, mode=0, pretrained=pretrained, **model_args)
 
 
 def simplenet_cifar_460k(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
     """original implementation of smaller variants of simplenet for cifar10/100 
     that were used in the paper 
-    """    
+    """
     model_variant = "simplenet_cifar_460k"
-    return _gen_simplenet(model_variant, network_idx=1, mode=0, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, network_idx=3, mode=0, pretrained=pretrained, **model_args)
 
 
 def simplenet_cifar_5m(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
     """The original implementation of simplenet trained on cifar10/100 in caffe.
-    """    
+    """
     model_variant = "simplenet_cifar_5m"
-    return _gen_simplenet(model_variant, network_idx=2, mode=0, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, network_idx=4, mode=0, pretrained=pretrained, **model_args)
 
 
 def simplenet_cifar_5m_extra_pool(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
     """An early pytorch implementation of simplenet that mistakenly used an extra pooling layer
     .it was not know until 2021 which was reported in https://github.com/Coderx7/SimpleNet_Pytorch/issues/5
     this is just here to be able to load the weights that were trained using this variation still available on the repository. 
-    """    
+    """
     model_variant = "simplenet_cifar_5m_extra_pool"
-    return _gen_simplenet(model_variant, network_idx=3, mode=0, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, network_idx=5, mode=0, pretrained=pretrained, **model_args)
+
 
 # imagenet models
 def simplenetv1_small_m1_05(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a small variant of simplenetv1_5m, with 1.5m parameters. This uses m1 stride mode
+    which makes it the fastest variant available. 
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """
     model_variant = "simplenetv1_small_m1_05"
-    return _gen_simplenet(model_variant, scale=0.5, network_idx=4, mode=1, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, scale=0.5, network_idx=0, mode=1, pretrained=pretrained, **model_args)
 
 
 def simplenetv1_small_m2_05(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a second small variant of simplenetv1_5m, with 1.5m parameters. This uses m2 stride mode
+    which makes it the second fastest variant available.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """
     model_variant = "simplenetv1_small_m2_05"
-    return _gen_simplenet(model_variant, scale=0.5, network_idx=4, mode=2, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, scale=0.5, network_idx=0, mode=2, pretrained=pretrained, **model_args)
 
 
 def simplenetv1_small_m1_075(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a third small variant of simplenetv1_5m, with 3m parameters. This uses m1 stride mode
+    which makes it the third fastest variant available.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """
     model_variant = "simplenetv1_small_m1_075"
-    return _gen_simplenet(model_variant, scale=0.75, network_idx=4, mode=1, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, scale=0.75, network_idx=0, mode=1, pretrained=pretrained, **model_args)
 
 
 def simplenetv1_small_m2_075(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a forth small variant of simplenetv1_5m, with 3m parameters. This uses m2 stride mode
+    which makes it the forth fastest variant available. 
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """
     model_variant = "simplenetv1_small_m2_075"
-    return _gen_simplenet(model_variant, scale=0.75, network_idx=4, mode=2, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, scale=0.75, network_idx=0, mode=2, pretrained=pretrained, **model_args)
 
 
 def simplenetv1_5m_m1(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates the base simplement model known as simplenetv1_5m, with 5m parameters. This variant uses m1 stride mode
+    which makes it a fast and performant model.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """
     model_variant = "simplenetv1_5m_m1"
-    return _gen_simplenet(model_variant, scale=1.0, network_idx=4, mode=1, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, scale=1.0, network_idx=0, mode=1, pretrained=pretrained, **model_args)
 
 
 def simplenetv1_5m_m2(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates the base simplement model known as simplenetv1_5m, with 5m parameters. This variant uses m2 stride mode
+    which makes it a bit more performant model compared to the m1 variant of the same variant at the expense of a bit slower inference.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """
     model_variant = "simplenetv1_5m_m2"
-    return _gen_simplenet(model_variant, scale=1.0, network_idx=4, mode=2, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, scale=1.0, network_idx=0, mode=2, pretrained=pretrained, **model_args)
 
 
 def simplenetv1_9m_m1(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a variant of the simplenetv1_5m, with 9m parameters. This variant uses m1 stride mode
+    which makes it run faster.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """
     model_variant = "simplenetv1_9m_m1"
-    return _gen_simplenet(model_variant, scale=1.0, network_idx=5, mode=1, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, scale=1.0, network_idx=1, mode=1, pretrained=pretrained, **model_args)
 
 
 def simplenetv1_9m_m2(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a variant of the simplenetv1_5m, with 9m parameters. This variant uses m2 stride mode
+    which makes it a bit more performant model compared to the m1 variant of the same variant at the expense of a bit slower inference.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """
     model_variant = "simplenetv1_9m_m2"
-    return _gen_simplenet(model_variant, scale=1.0, network_idx=5, mode=2, pretrained=pretrained, **kwargs)
+    model_args = remove_network_settings(kwargs)
+    return _gen_simplenet(model_variant, scale=1.0, network_idx=1, mode=2, pretrained=pretrained, **model_args)
 
 
 if __name__ == "__main__":
-    model = simplenet_cifar_5m(num_classes=10)
+    model = simplenet(network_idx=4, mode=0, num_classes=10)
     input_dummy = torch.randn(size=(1, 3, 32, 32))
     out = model(input_dummy)
     # out.mean().backward()
