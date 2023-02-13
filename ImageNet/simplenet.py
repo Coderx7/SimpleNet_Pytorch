@@ -257,12 +257,12 @@ class SimpleNet(nn.Module):
         self.in_chans = in_chans
         self.scale = scale
         self.networks = [
-            "simplenetv1_imagenet",  # 0
+            "simplenetv1_imagenet",     # 0
             "simplenetv1_imagenet_9m",  # 1
             # other archs
-            "simplenet_cifar_310k",  # 2
-            "simplenet_cifar_460k",  # 3
-            "simplenet_cifar_5m",  # 4
+            "simplenet_cifar_310k",     # 2
+            "simplenet_cifar_460k",     # 3
+            "simplenet_cifar_5m",       # 4
             "simplenet_cifar_5m_extra_pool",  # 5
         ]
         self.network_idx = network_idx
