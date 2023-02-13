@@ -15,14 +15,11 @@ Official Caffe impl at https://github.com/Coderx7/SimpleNet
 Official Pythorch impl at https://github.com/Coderx7/SimpleNet_Pytorch
 Seyyed Hossein Hasanpour
 """
-# import os
 import math
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-
-# from torch.hub import download_url_to_file
 
 from typing import Union, Tuple, List, Dict, Any, cast, Optional
 
@@ -79,10 +76,10 @@ default_cfgs: Dict[str, Dict[str, Any]] = {
     "simplenetv1_5m_m2": _cfg(
         url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_5m_m2-324ba7cc.pth"
     ),
-    "simplenetv1_m1_9m": _cfg(
+    "simplenetv1_9m_m1": _cfg(
         url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_9m_m1-00000000.pth"
     ),
-    "simplenetv1_m2_9m": _cfg(
+    "simplenetv1_9m_m2": _cfg(
         url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0-alpha/simv1_9m_m2-00000000.pth"
     ),
 }
@@ -106,15 +103,21 @@ class SimpleNet(nn.Module):
     ):
         """Instantiates a SimpleNet model. SimpleNet is comprised of the most basic building blocks of a CNN architecture.
         It uses basic principles to maximize the network performance both in terms of feature representation and speed without
-        resorting to complex design or operators.
+        resorting to complex design or operators. 
         
         Args:
             num_classes (int, optional): number of classes. Defaults to 1000.
             in_chans (int, optional): number of input channels. Defaults to 3.
             scale (float, optional): scale of the architecture width. Defaults to 1.0.
             network_idx (int, optional): the network index indicating the 5 million or 8 million version(0 and 1 respectively). Defaults to 0.
-            mode (int, optional): stride mode of the architecture. specifies how fast the input shrinks. 
-                you can choose between 0 and 4. (note for imagenet use 1-4). Defaults to 2.
+            mode (int, optional): stride mode of the architecture. specifies how fast the input shrinks.
+                This is used for larger input sizes such as the 224x224 in imagenet training where the
+                input size incurs a lot of overhead if not downsampled properly. 
+                you can choose between 0 meaning no change and 4. where each number denotes a specific
+                downsampling strategy. For imagenet use 1-4.
+                the larger the stride mode, the higher accuracy and the slower
+                the network gets. stride mode 1 is the fastest and achives very good accuracy.
+                Defaults to 2.
             drop_rates (Dict[int,float], optional): custom drop out rates specified per layer. 
                 each rate should be paired with the corrosponding layer index(pooling and cnn layers are counted only). Defaults to {}.
         """
@@ -333,22 +336,23 @@ class SimpleNet(nn.Module):
     def get_classifier(self):
         return self.classifier
 
-    def reset_classifier(self, num_classes, network_idx=0, scale=1.0):
+    def reset_classifier(self, num_classes: int):
         self.num_classes = num_classes
-        self.classifier = nn.Linear(round(self.cfg[self.networks[network_idx]][-1][1] * scale), num_classes)
+        self.classifier = nn.Linear(round(self.cfg[self.networks[self.network_idx]][-1][1] * self.scale), num_classes)
 
     def forward_features(self, x: torch.Tensor) -> torch.Tensor:
-        x = self.features(x)
-        x = F.max_pool2d(x, kernel_size=x.size()[2:])
-        x = F.dropout2d(x, self.last_dropout_rate, training=self.training)
-        x = x.view(x.size(0), -1)
-        return x
+        return self.features(x)
 
     def forward_head(self, x: torch.Tensor, pre_logits: bool = False):
-        x = self.forward_features(x)
-        return x if pre_logits else self.classifier(x)
+        x_ = self.forward_features(x)
+        if pre_logits:
+            return x
+        else:
+            x = F.max_pool2d(x, kernel_size=x.size()[2:])
+            x = F.dropout2d(x, self.last_dropout_rate, training=self.training)
+            x = x.view(x.size(0), -1)
+        return self.classifier(x)
 
-!Test this after this change, and update the pure pytorch version and cifar10 versions as well- test classification test extensively again
 def _gen_simplenet(
     model_variant: str = "simplenetv1_m2",
     num_classes: int = 1000,
@@ -371,26 +375,28 @@ def _gen_simplenet(
         **kwargs,
     )
     model = build_model_with_cfg(SimpleNet, model_variant, pretrained, **model_args)
-
-    # model = SimpleNet(num_classes, in_chans, scale=scale, network_idx=network_idx, mode=mode, drop_rates=drop_rates)
-    # if pretrained:
-    #     cfg = default_cfgs.get(model_variant, None)
-    #     if cfg is None:
-    #         raise Exception(f"Unknown model variant ('{model_variant}') specified!")
-    #     url = cfg["url"]
-    #     checkpoint_filename = url.split("/")[-1]
-    #     checkpoint_path = f"tmp/{checkpoint_filename}"
-    #     print(f"saving in checkpoint_path:{checkpoint_path}")
-    #     if not os.path.exists(checkpoint_path):
-    #         os.makedirs("tmp")
-    #         download_url_to_file(url, checkpoint_path)
-    #     checkpoint = torch.load(checkpoint_path, map_location="cpu",)
-    #     model.load_state_dict(checkpoint)
     return model
 
 
 @register_model
 def simplenet(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Generic simplenet model builder. by default it returns `simplenetv1_5m_m2` model
+    but specifying different arguments such as `netidx`, `scale` or `mode` will result in 
+    the corrosponding network variant. 
+    
+    when pretrained is specified, if the combination of settings resemble any known variants
+    specified in the `default_cfg`, their respective pretrained weights will be loaded, otherwise
+    an exception will be thrown denoting Unknown model variant being specified.  
+
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights only if the model is a known variant specified in default_cfg. Defaults to False.
+
+    Raises:
+        Exception: if pretrained is used with an unknown/custom model variant and exception is raised.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """    
     num_classes = kwargs.get("num_classes", 1000)
     in_chans = kwargs.get("in_chans", 3)
     scale = kwargs.get("scale", 1.0)
@@ -414,11 +420,7 @@ def simplenet(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
             config = f"small_m{mode}_05"
         else:
             config = f"m{mode}_{scale:.2f}".replace(".", "")
-
-        if network_idx == 0:
-            model_variant = f"simplenetv1_{config}"
-        else:
-            model_variant = f"simplenetv1_{config}"
+        model_variant = f"simplenetv1_{config}"
         
         cfg = default_cfgs.get(model_variant, None)
         if cfg is None:
@@ -477,6 +479,15 @@ def remove_network_settings(kwargs: Dict[str,Any]) -> Dict[str,Any]:
 # imagenet models
 @register_model
 def simplenetv1_small_m1_05(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a small variant of simplenetv1_5m, with 1.5m parameters. This uses m1 stride mode
+    which makes it the fastest variant available. 
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """    
     model_variant = "simplenetv1_small_m1_05"
     model_args = remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.5, network_idx=0, mode=1, pretrained=pretrained, **model_args)
@@ -484,6 +495,15 @@ def simplenetv1_small_m1_05(pretrained: bool = False, **kwargs: Any) -> SimpleNe
 
 @register_model
 def simplenetv1_small_m2_05(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a second small variant of simplenetv1_5m, with 1.5m parameters. This uses m2 stride mode
+    which makes it the second fastest variant available.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """    
     model_variant = "simplenetv1_small_m2_05"
     model_args = remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.5, network_idx=0, mode=2, pretrained=pretrained, **model_args)
@@ -491,6 +511,15 @@ def simplenetv1_small_m2_05(pretrained: bool = False, **kwargs: Any) -> SimpleNe
 
 @register_model
 def simplenetv1_small_m1_075(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a third small variant of simplenetv1_5m, with 3m parameters. This uses m1 stride mode
+    which makes it the third fastest variant available.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """    
     model_variant = "simplenetv1_small_m1_075"
     model_args = remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.75, network_idx=0, mode=1, pretrained=pretrained, **model_args)
@@ -498,6 +527,15 @@ def simplenetv1_small_m1_075(pretrained: bool = False, **kwargs: Any) -> SimpleN
 
 @register_model
 def simplenetv1_small_m2_075(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a forth small variant of simplenetv1_5m, with 3m parameters. This uses m2 stride mode
+    which makes it the forth fastest variant available. 
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """ 
     model_variant = "simplenetv1_small_m2_075"
     model_args = remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.75, network_idx=0, mode=2, pretrained=pretrained, **model_args)
@@ -505,6 +543,15 @@ def simplenetv1_small_m2_075(pretrained: bool = False, **kwargs: Any) -> SimpleN
 
 @register_model
 def simplenetv1_5m_m1(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates the base simplement model known as simplenetv1_5m, with 5m parameters. This variant uses m1 stride mode
+    which makes it a fast and performant model.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """  
     model_variant = "simplenetv1_5m_m1"
     model_args = remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=0, mode=1, pretrained=pretrained, **model_args)
@@ -512,6 +559,15 @@ def simplenetv1_5m_m1(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
 
 @register_model
 def simplenetv1_5m_m2(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates the base simplement model known as simplenetv1_5m, with 5m parameters. This variant uses m2 stride mode
+    which makes it a bit more performant model compared to the m1 variant of the same variant at the expense of a bit slower inference.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """ 
     model_variant = "simplenetv1_5m_m2"
     model_args = remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=0, mode=2, pretrained=pretrained, **model_args)
@@ -519,6 +575,15 @@ def simplenetv1_5m_m2(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
 
 @register_model
 def simplenetv1_9m_m1(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a variant of the simplenetv1_5m, with 9m parameters. This variant uses m1 stride mode
+    which makes it run faster.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """ 
     model_variant = "simplenetv1_9m_m1"
     model_args = remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=1, mode=1, pretrained=pretrained, **model_args)
@@ -526,6 +591,15 @@ def simplenetv1_9m_m1(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
 
 @register_model
 def simplenetv1_9m_m2(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
+    """Creates a variant of the simplenetv1_5m, with 9m parameters. This variant uses m2 stride mode
+    which makes it a bit more performant model compared to the m1 variant of the same variant at the expense of a bit slower inference.  
+    
+    Args:
+        pretrained (bool, optional): loads the model with pretrained weights. Defaults to False.
+
+    Returns:
+        SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
+    """ 
     model_variant = "simplenetv1_9m_m2"
     model_args = remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=1, mode=2, pretrained=pretrained, **model_args)
