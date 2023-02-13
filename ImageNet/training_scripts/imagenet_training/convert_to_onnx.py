@@ -1,5 +1,6 @@
 #in the name of God the most compassionate the most merciful 
 # conver pytorch model to onnx models
+import os
 import argparse
 import numpy as np
 
@@ -15,6 +16,7 @@ parser.add_argument('--num-classes', type=int, default=1000, help='Number classe
 parser.add_argument('--weights', default='', type=str, metavar='PATH', help='path to model weights (default: none)')
 parser.add_argument('--output', default='simpnet.onnx', type=str, metavar='FILENAME', help='Output model file (.onnx model)')
 # parser.add_argument('--opset', default=0, type=int, help='opset version (default:0) valid values, 0 to 10')
+parser.add_argument('--use_input_dir', action='store_true', default=False, help='save in the same directory as input')
 parser.add_argument('--jit', action='store_true', default=False, help='convert the model to jit before conversion to onnx')
 parser.add_argument('--netscale', type=float, default=1.0, help='scale of the net (default 1.0)')
 parser.add_argument('--netidx', type=int, default=0, help='which network to use (5mil or 8mil)')
@@ -36,20 +38,27 @@ model.load_state_dict(model_weights)
 model.eval()
 
 dummy_input = torch.randn(1, 3, 224, 224, device="cpu")
+   
+new_output_name = args.output 
+if args.use_input_dir:
+    base_name = os.path.basename(args.weights)
+    dir = args.weights.replace(base_name,'')
+    new_output_name = os.path.join(dir,base_name.replace('.pth','.onnx'))
 
 if args.jit:
     model = torch.jit.trace(model, dummy_input)
-    model.save(f"{args.output.replace('.onnx','-jit')}.pt")
+    model.save(f"{new_output_name.replace('.onnx','-jit')}.pt")
 
 input_names = ["data"]
 output_names = ["pred"]
 # for caffe conversion its must be 9.
-torch.onnx.export(model, dummy_input, args.output, opset_version=9, verbose=True, input_names=input_names, output_names=output_names)
+#! train mode crashes for some reason, need to report the bug.
+torch.onnx.export(model, dummy_input, new_output_name, opset_version=9, verbose=True, input_names=input_names, output_names=output_names)
 
 print(f'Converted successfully to onnx.')
 print('Testing the new onnx model...')
 # Load the ONNX model
-model_onnx = onnx.load(args.output)
+model_onnx = onnx.load(new_output_name)
 # Check that the model is well formed
 onnx.checker.check_model(model_onnx)
 # Print a human readable representation of the graph
@@ -61,7 +70,7 @@ def to_numpy(tensor):
 # pytorch model output
 torch_out = model(dummy_input)
 # onnx model output
-ort_session = onnxruntime.InferenceSession(args.output)
+ort_session = onnxruntime.InferenceSession(new_output_name)
 # compute ONNX Runtime output prediction
 ort_inputs = {ort_session.get_inputs()[0].name: to_numpy(dummy_input)}
 ort_outs = ort_session.run(None, ort_inputs)
