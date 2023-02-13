@@ -41,7 +41,7 @@ The original Caffe implementation can be found here : [Original Caffe implementa
 
 
 #### Models and logs  
--- Models and training logs can be found in [snapshot folder](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/snapshots).
+-- Models and training logs can be found in [snapshot folder](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/Cifar/snapshots).
 
 
 

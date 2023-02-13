@@ -15,10 +15,16 @@ The pytorch implementation is also very effieicent and the whole model takes onl
 
 #### Update History:  
 
--- 2022: Adding ImageNet models   
-
--- 2018: Initial commit    
-
+<pre>
+-- 2023 Feb 12: 
+  -- re-structured the repository, moving the old implementation into new directory named 'Cifar` and imagenet into its respective directory
+  -- updated the old implementation to work with latest version of pytorch.
+  -- updated the imagenet scripts/models compatible with timm and a separate version for pure pytorch uscases
+  -- updated pretrained models with the latest results 
+-- 2022: Adding initial ImageNet models   
+-- 2018: Initial Pytorch implementation (for CIFAR10/100/MNIST/SVHN datasets)    
+-- 2016: Initial model release for caffe
+</pre>
 
 
 The original Caffe implementation can be found here : [Original Caffe implementation - 2016](https://github.com/Coderx7/SimpleNet)     
@@ -27,18 +33,15 @@ The original Caffe implementation can be found here : [Original Caffe implementa
 
 | **Method**                   | **\#Params** |  **ImageNet** | **ImageNet-Real-Labels**  |
 | :--------------------------- | :----------: | :-----------: | :-----------: |  
-| SimpleNetV1_imagenet(23 MB)   |     5.7m     | 71.50/90.05   | 78.88/93.43   |         
-| SimpleNetV1_imagenet(13 MB)   |     3m       | 67.85/87.76   | 75.42/91.76   |  
-| SimpleNetV1_imagenet(6 MB)    |     1.5m     | 61.39/83.36   | 69.07/88.01   |   
+| SimpleNetV1_imagenet(38 MB)   |     9.5m     | 74.17/91.61   | 81.24/94.63   |  
+| SimpleNetV1_imagenet(23 MB)   |     5.7m     | 71.94/90.3    | 79.12/93.68   |         
+| SimpleNetV1_imagenet(13 MB)   |     3m       | 68.15/87.76   | 75.66/91.80   |  
+| SimpleNetV1_imagenet(6 MB)    |     1.5m     | 61.53/83.43   | 69.11/88.10   |   
 
--- After nearly 7 years I could finally get my hands on a good GPU(RTX3080) and train the model on imagenet!      
-I used [rwightman/pytorch-image-models](https://github.com/rwightman/pytorch-image-models) repository to train the models. 
-He did a great job by the way! 
-I'll be updating the whole repository in the upcomming days inshaalah!   
-SimpleNet performs very decently, it outperforms VGGNet, ResNet and even some variants of MobileNets(1-3)   
-and its fast, very fast! (based on the model up to 2x faster).   
+SimpleNet performs very decently, it outperforms VGGNet, variants of ResNet and MobileNets(1-3)   
+and its fast, very fast!  
 
--- The models(pytorch, onnx, jit) can be found in [imagenet models directory](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/ImageNet%20models).
+-- The models pretrained weights (pytorch, onnx, jit) can be found in [Release section](https://github.com/Coderx7/SimpleNet_Pytorch/releases)  
 
 
 #### CIFAR10/100 Results achieved using this implementation :
@@ -69,15 +72,8 @@ and its fast, very fast! (based on the model up to 2x faster).
 
 
 #### Models and logs  
--- Models and training logs can be found in [snapshot folder](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/snapshots).
+-- refer to each dataset directory in the repository for further information on how to access models.
 
-
-
-#### How to run ? 
-Simply initiate the training like :  
-`python3 main.py ./data/cifar.python --dataset cifar10 --arch simplenet --save_path ./snapshots/simplenet --epochs 540 --batch_size 100 --workers 2`
-
-Note that, the initial learning rate, and optimization policy is hard coded just like caffe.
 
 ## Citation
 If you find SimpleNet useful in your research, please consider citing:
