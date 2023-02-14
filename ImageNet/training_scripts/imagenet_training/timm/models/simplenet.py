@@ -76,10 +76,10 @@ default_cfgs: Dict[str, Dict[str, Any]] = {
     "simplenetv1_5m_m2": _cfg(
         url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_5m_m2-c35297bf.pth"
     ),
-    "simplenetv1_m1_9m": _cfg(
+    "simplenetv1_9m_m1": _cfg(
         url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_9m_m1-8c98a0a5.pth"
     ),
-    "simplenetv1_m2_9m": _cfg(
+    "simplenetv1_9m_m2": _cfg(
         url="https://github.com/Coderx7/SimpleNet_Pytorch/releases/download/v1.0.0/simplenetv1_9m_m2-6b01be1e.pth"
     ),
 }
