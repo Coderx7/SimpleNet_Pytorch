@@ -25,7 +25,7 @@ from collections import OrderedDict
 from contextlib import suppress
 from datetime import datetime
 import matplotlib.pyplot as plt
-
+from fvcore.nn import FlopCountAnalysis,flop_count_table
 
 import pickle
 import torch
@@ -208,6 +208,11 @@ parser.add_argument('--netscale', type=float, default=1.0, help='scale of the ne
 parser.add_argument('--netidx', type=int, default=0, help='which network to use (5mil or 8mil)')
 parser.add_argument('--netmode', type=int, default=1, help='which stride mode to use(1 to 5)')
 
+parser.add_argument('--freeze-top', action='store_true', default=False, help='Freeze early layers up to idx36')
+parser.add_argument('--freeze-bot', action='store_true', default=False, help='Freeze late layers from idx36 to the end')
+parser.add_argument('--debug', action='store_true', default=False, help='whether to enable set_detect_anomaly() or not')
+parser.add_argument('--use-avgs', default='', type=str, metavar='PATH',help='Resume full model and optimizer state from checkpoint (default: none)')
+
 # torch.autograd.set_detect_anomaly(True)
 def _parse_args():
     # Do we have a config file to parse?
@@ -304,6 +309,9 @@ def main():
     if args.fuser:
         set_jit_fuser(args.fuser)
     
+    if args.debug:    
+        torch.autograd.set_detect_anomaly(True)
+        
     # convert into int
     args.drop_rates = {int(key):float(value) for key,value in args.drop_rates.items()}
     print(f'args.drop_rates: {args.drop_rates}')
@@ -334,7 +342,10 @@ def main():
         model.set_grad_checkpointing(enable=True)
 
     if args.local_rank == 0:
+        flops = FlopCountAnalysis(model, torch.randn(size=(1,3,224,224)))
         _logger.info(f'Model {safe_model_name(args.model)} created, param count:{sum([m.numel() for m in model.parameters()]):,}')
+        _logger.info(f'Model {safe_model_name(args.model)} created, FLOPS count:{flops.total():,}')
+        # _logger.info(f'Model {safe_model_name(args.model)} Flops table\n{flop_count_table(flops)}')
     
     _logger.info(f'Model: {model}')
     data_config = resolve_data_config(vars(args), model=model, verbose=args.local_rank == 0)
@@ -570,6 +581,25 @@ def main():
             f.write(args_text)
 
     try:
+        # freeze top layers
+        if args.freeze_bot:
+            for n,v in model.features.named_parameters():
+                if int(n.split('.')[0]) <=36:
+                    v.requires_grad=False
+        elif args.freeze_top:
+            for n,v in model.features.named_parameters():
+                if int(n.split('.')[0]) >=36:
+                    v.requires_grad=False
+                    
+        if args.freeze_top or args.freeze_bot:
+            for n,v in model.features.named_parameters():
+                print(f'{n}.requires_grad: {v.requires_grad}')
+        
+        if args.use_avgs:
+            checkpoint_avgs = torch.load(args.use_avgs,map_location='cuda')
+            model.load_state_dict(checkpoint_avgs)
+            print(f'avg model loaded')
+        
         for epoch in range(start_epoch, num_epochs):
             if args.distributed and hasattr(loader_train.sampler, 'set_epoch'):
                 loader_train.sampler.set_epoch(epoch)
