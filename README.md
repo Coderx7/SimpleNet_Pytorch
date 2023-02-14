@@ -33,13 +33,13 @@ The original Caffe implementation can be found here : [Original Caffe implementa
 
 | **Method**                   | **\#Params** |  **ImageNet** | **ImageNet-Real-Labels**  |
 | :--------------------------- | :----------: | :-----------: | :-----------: |  
-| SimpleNetV1_imagenet(38 MB)   |     9.5m     | 74.17/91.61   | 81.24/94.63   |  
-| SimpleNetV1_imagenet(23 MB)   |     5.7m     | 71.94/90.3    | 79.12/93.68   |         
-| SimpleNetV1_imagenet(13 MB)   |     3m       | 68.15/87.76   | 75.66/91.80   |  
-| SimpleNetV1_imagenet(6 MB)    |     1.5m     | 61.53/83.43   | 69.11/88.10   |   
+| SimpleNetV1_imagenet(36.33 MB)   |     9.5m     | 74.17/91.614   | 81.24/94.63   |  
+| SimpleNetV1_imagenet(21.9 MB)   |     5.7m     | 71.936/90.3    | 79.12/93.68   |         
+| SimpleNetV1_imagenet(12.58 MB)   |     3m       | 68.15/87.762   | 75.66/91.80   |  
+| SimpleNetV1_imagenet(5.78 MB)    |     1.5m     | 61.524/83.43   | 69.11/88.10   |   
 
 SimpleNet performs very decently, it outperforms VGGNet, variants of ResNet and MobileNets(1-3)   
-and its fast, very fast!  
+and its pretty fast as well!  
 
 -- The models pretrained weights (pytorch, onnx, jit) can be found in [Release section](https://github.com/Coderx7/SimpleNet_Pytorch/releases)  
 
