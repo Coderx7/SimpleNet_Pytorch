@@ -436,7 +436,7 @@ def remove_network_settings(kwargs: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         Dict[str,Any]: cleaned kwargs
     """
-    model_args = {k: v for k, v in kwargs.items() if k not in ["scale", "network_idx", "mode"]}
+    model_args = {k: v for k, v in kwargs.items() if k not in ["scale", "network_idx", "mode","drop_rate"]}
     return model_args
 
 
