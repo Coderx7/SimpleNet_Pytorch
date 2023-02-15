@@ -1,0 +1,16 @@
+tf_mobilenetv3_small_100
+dla60x_c
+mobilenetv3_small_100
+mnasnet_small
+dla46x_c
+mobilenetv2_050
+tf_mobilenetv3_small_075
+mobilenetv3_small_075
+dla46_c
+lcnet_050
+tf_mobilenetv3_small_minimal_100
+mobilenetv3_small_050
+simplenetv1_small_m1_05
+simplenetv1_small_m2_05
+simplenetv1_small_m1_075
+simplenetv1_small_m2_075
