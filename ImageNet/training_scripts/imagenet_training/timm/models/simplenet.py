@@ -338,7 +338,7 @@ class SimpleNet(nn.Module):
 
     def reset_classifier(self, num_classes: int):
         self.num_classes = num_classes
-        self.classifier = nn.Linear(round(self.cfg[self.networks[self.network_idx]][-1][1] * self.scale), num_classes)
+        self.classifier = nn.Linear(round(self.cfg[self.networks[self.network_idx]][-1][0] * self.scale), num_classes)
 
     def forward_features(self, x: torch.Tensor) -> torch.Tensor:
         return self.features(x)
@@ -367,15 +367,18 @@ def _gen_simplenet(
 ) -> SimpleNet:
 
     model_args = dict(
-        num_classes=num_classes,
-        in_chans=in_chans,
-        scale=scale,
-        network_idx=network_idx,
-        mode=mode,
-        drop_rates=drop_rates,
-        **kwargs,
+        in_chans=in_chans, scale=scale, network_idx=network_idx, mode=mode, drop_rates=drop_rates, **kwargs,
     )
+    # to allow for seemless finetuning, remove the num_classes
+    # and load the model intact, we apply the changes afterward!
+    if "num_classes" in kwargs:
+        kwargs.pop("num_classes")
     model = build_model_with_cfg(SimpleNet, model_variant, pretrained, **model_args)
+    # if the num_classes is different than imagenet's, it
+    # means its going to be finetuned, so only create a
+    # new classifier after the whole model is loaded!
+    if num_classes != 1000:
+        model.reset_classifier(num_classes)
     return model
 
 
@@ -436,7 +439,7 @@ def remove_network_settings(kwargs: Dict[str, Any]) -> Dict[str, Any]:
     Returns:
         Dict[str,Any]: cleaned kwargs
     """
-    model_args = {k: v for k, v in kwargs.items() if k not in ["scale", "network_idx", "mode","drop_rate"]}
+    model_args = {k: v for k, v in kwargs.items() if k not in ["scale", "network_idx", "mode", "drop_rate"]}
     return model_args
 
 
