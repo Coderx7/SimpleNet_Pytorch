@@ -1,3 +1,5 @@
+بسم الله الرحمن الرحیم  
+پیاده سازی پایتورچ سیمپل نت
 # SimpleNet in Pytorch
 SimpleNetV1 architecture implementation in Pytorch 
 
@@ -39,7 +41,8 @@ The original Caffe implementation can be found here : [Original Caffe implementa
 | SimpleNetV1_imagenet(5.78 MB)    |     1.5m     | 61.524/83.43   | 69.11/88.10   |   
 
 SimpleNet performs very decently, it outperforms VGGNet, variants of ResNet and MobileNets(1-3)   
-and its pretty fast as well!  
+and its pretty fast as well! and its all using plain old CNN!.  
+For benchmark results [look here](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/ImageNet/training_scripts/imagenet_training/results) 
 
 -- The models pretrained weights (pytorch, onnx, jit) can be found in [Release section](https://github.com/Coderx7/SimpleNet_Pytorch/releases)  
 
