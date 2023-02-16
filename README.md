@@ -42,7 +42,62 @@ The original Caffe implementation can be found here : [Original Caffe implementa
 
 SimpleNet performs very decently, it outperforms VGGNet, variants of ResNet and MobileNets(1-3)   
 and its pretty fast as well! and its all using plain old CNN!.  
-For benchmark results [look here](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/ImageNet/training_scripts/imagenet_training/results) 
+
+Here's an example of benchmark run on small variants of simplenet and some other known architectures such as mobilenets.    
+Small variants of simplenet consistently achieve high performance/accuracy:  
+
+|       model                       | samples_per_sec   |  param_count  | top1   | top5   |
+|:----------------------------------| :--------------:  | :-----------: | :--:   | :---:  |  
+|mobilenetv3_small_050              |     3035.37       | 1.59          | 57.89  | 80.194 |
+|**simplenetv1_small_m1_05**            |     2839.35         | 1.51          | **60.89**|**82.978**|
+|lcnet_050                          |     2683.57       | 1.88          | 63.1   | 84.382 |
+|**simplenetv1_small_m2_05**            |     2340.51       | 1.51          |**61.524**|**83.432**|
+|mobilenetv3_small_075              |     1781.14       | 2.04          | 65.242 | 85.438 |
+|tf_mobilenetv3_small_075           |     1674.31       | 2.04          | 65.714 | 86.134 |
+|**simplenetv1_small_m1_075**           |     1524.64       | 3.29          |**67.764**|**87.66** |
+|tf_mobilenetv3_small_minimal_100   |     1308.27       | 2.04          | 62.908 | 84.234 |
+|**simplenetv1_small_m2_075**           |     1264.33       | 3.29          |**68.15** |**87.762**|
+|mobilenetv3_small_100              |     1263.23       | 2.54          | 67.656 | 87.634 |
+|tf_mobilenetv3_small_100           |     1220.08       | 2.54          | 67.924 | 87.664 |
+|mnasnet_small                      |     1085.15       | 2.03          | 66.206 | 86.508 |
+|mobilenetv2_050                    |     848.38        | 1.97          | 65.942 | 86.082 |
+|dla46_c                            |     531.0         | 1.3           | 64.866 | 86.294 |
+|dla46x_c                           |     318.32        | 1.07          | 65.97  | 86.98  |
+|dla60x_c                           |     298.59        | 1.32          | 67.892 | 88.426 |
+
+and this is a sample for larger models: simplenet variants outperform many newer architecures.  
+
+|            model                  |  samples_per_sec | param_count   |  top1  |  top5  |
+|:----------------------------------| :--------------: | :-----------: | :--:   | :---:  |  
+| vit_tiny_r_s16_p8_224             |     1882.23      |   6.34        | 71.792 | 90.822 |
+| simplenetv1_small_m1_075          |     1516.74      |   3.29        | 67.764 | 87.660 |
+| simplenetv1_small_m2_075          |     1260.89      |   3.29        | 68.150 | 87.762 |
+| simplenetv1_5m_m1                 |     1107.70      |   5.75        | 71.370 | 90.100 |
+| deit_tiny_patch16_224             |      991.41      |   5.72        | 72.172 | 91.114 |
+| resnet18                          |      876.92      |  11.69        | 69.744 | 89.082 |
+| simplenetv1_5m_m2                 |      835.17      |   5.75        | 71.936 | 90.300 |
+| crossvit_9_240                    |      602.13      |   8.55        | 73.960 | 91.968 |
+| vit_base_patch32_224_sam          |      571.37      |  88.22        | 73.694 | 91.010 |
+| tinynet_b                         |      530.15      |   3.73        | 74.976 | 92.184 |
+| resnet26                          |      524.36      |  16.00        | 75.300 | 92.578 |
+| tf_mobilenetv3_large_075          |      505.13      |   3.99        | 73.436 | 91.344 |
+| resnet34                          |      491.96      |  21.80        | 75.114 | 92.284 |
+| regnetx_006                       |      478.41      |   6.20        | 73.860 | 91.672 |
+| dla34                             |      472.49      |  15.74        | 74.620 | 92.072 |
+| simplenetv1_9m_m1                 |      459.21      |   9.51        | 73.376 | 91.048 |
+| repvgg_b0                         |      455.36      |  15.82        | 75.160 | 92.418 |
+| ghostnet_100                      |      407.03      |   5.18        | 73.974 | 91.460 |
+| tf_mobilenetv3_large_minimal_100  |       406.84     |   3.92        | 72.250 | 90.630 |
+| mobilenetv3_large_100             |      402.08      |   5.48        | 75.766 | 92.544 |
+| simplenetv1_9m_m2                 |      389.94      |   9.51        | 74.170 | 91.614 |
+| tf_mobilenetv3_large_100          |      388.30      |   5.48        | 75.518 | 92.604 |
+| mobilenetv2_100                   |      295.68      |   3.50        | 72.970 | 91.020 |
+| densenet121                       |      293.94      |   7.98        | 75.584 | 92.652 |
+| mnasnet_100                       |      262.25      |   4.38        | 74.658 | 92.112 |
+
+
+Benchmark was done using a GTX1080 on Pytorch 1.11 with fp32, nhwc, batchsize of 256, input size = `224x224x3`.   
+For all benchmark results [look here](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/ImageNet/training_scripts/imagenet_training/results) 
 
 -- The models pretrained weights (pytorch, onnx, jit) can be found in [Release section](https://github.com/Coderx7/SimpleNet_Pytorch/releases)  
 
