@@ -344,7 +344,7 @@ class SimpleNet(nn.Module):
         return self.features(x)
 
     def forward_head(self, x: torch.Tensor, pre_logits: bool = False):
-        x_ = self.forward_features(x)
+        x = self.forward_features(x)
         if pre_logits:
             return x
         else:
