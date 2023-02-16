@@ -94,7 +94,17 @@ and this is a sample for larger models: simplenet variants outperform many newer
 | mobilenetv2_100                   |      295.68      |   3.50        | 72.970 | 91.020 |
 | densenet121                       |      293.94      |   7.98        | 75.584 | 92.652 |
 | mnasnet_100                       |      262.25      |   4.38        | 74.658 | 92.112 |
-
+| vgg11                             |      260.38      | 132.86        | 69.028 | 88.626 |
+| vgg11_bn                          |      248.92      | 132.87        | 70.360 | 89.802 |
+| mobilenetv2_110d                  |      230.80      |   4.52        | 75.038 | 92.184 |
+| efficientnet_lite0                |      224.81      |   4.65        | 75.476 | 92.512 |
+| tf_efficientnet_lite0             |      219.93      |   4.65        | 74.832 | 92.174 |
+| vgg13                             |      154.03      | 133.05        | 69.926 | 89.246 |
+| vgg13_bn                          |      144.39      | 133.05        | 71.594 | 90.376 |
+| vgg16                             |      123.70      | 138.36        | 71.590 | 90.382 |
+| vgg16_bn                          |      117.06      | 138.37        | 73.350 | 91.504 |
+| vgg19                             |      103.71      | 143.67        | 72.366 | 90.870 |
+| vgg19_bn                          |      98.59       | 143.68        | 74.214 | 91.848 |
 
 Benchmark was done using a GTX1080 on Pytorch 1.11 with fp32, nhwc, batchsize of 256, input size = `224x224x3`.   
 For all benchmark results [look here](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/ImageNet/training_scripts/imagenet_training/results) 
