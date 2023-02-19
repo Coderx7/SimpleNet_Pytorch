@@ -240,8 +240,8 @@ class SimpleNet(nn.Module):
                 (320, 1, 0.0),
             ],
         }
-
-        self.dropout_rates = drop_rates
+        # make sure values are in proper form!
+        self.dropout_rates = {int(key):float(value) for key,value in drop_rates.items()}
         # 15 is the last layer of the network(including two previous pooling layers)
         # basically specifying the dropout rate for the very last layer to be used after the pooling
         self.last_dropout_rate = self.dropout_rates.get(15, 0.0)
