@@ -351,7 +351,7 @@ def _gen_simplenet(
         checkpoint_path = f"tmp/{checkpoint_filename}"
         print(f"saving in checkpoint_path:{checkpoint_path}")
         if not os.path.exists(checkpoint_path):
-            os.makedirs("tmp")
+            os.makedirs("tmp", exist_ok=True)
             download_url_to_file(url, checkpoint_path)
         checkpoint = torch.load(checkpoint_path, map_location="cpu",)
         model.load_state_dict(checkpoint)
