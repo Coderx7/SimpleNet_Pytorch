@@ -18,6 +18,9 @@ The pytorch implementation is also very effieicent and the whole model takes onl
 #### Update History:  
 
 <pre>
+-- 2023 Apr 13:
+  -- new weights for the removed paddings for 1x1 conv layers.
+  -- some minor fixes
 -- 2023 Feb 12: 
   -- re-structured the repository, moving the old implementation into new directory named 'Cifar` and imagenet into its respective directory
   -- updated the old implementation to work with latest version of pytorch.
@@ -33,12 +36,12 @@ The original Caffe implementation can be found here : [Original Caffe implementa
   
 #### ImageNet Result:  
 
-| **Method**                   | **\#Params** |  **ImageNet** | **ImageNet-Real-Labels**  |
-| :--------------------------- | :----------: | :-----------: | :-----------: |  
-| SimpleNetV1_imagenet(36.33 MB)   |     9.5m     | 74.17/91.614   | 81.24/94.63   |  
-| SimpleNetV1_imagenet(21.9 MB)   |     5.7m     | 71.936/90.3    | 79.12/93.68   |         
-| SimpleNetV1_imagenet(12.58 MB)   |     3m       | 68.15/87.762   | 75.66/91.80   |  
-| SimpleNetV1_imagenet(5.78 MB)    |     1.5m     | 61.524/83.43   | 69.11/88.10   |   
+|       **Model**                  | **\#Params** |  **ImageNet**   | **ImageNet-Real-Labels**  |
+| :---------------------------     | :----------: | :-----------:   |   :------------------:    |  
+| simplenetv1_9m_m2(36.3 MB)       |     9.5m     | 74.23 / 91.748  |      81.22 / 94.756         |  
+| simplenetv1_5m_m2(22 MB)         |     5.7m     | 72.03 / 90.324  |      79.328/ 93.714        |         
+| simplenetv1_small_m2_075(12.6 MB)|     3m       | 68.506/ 88.15   |      76.283/ 92.02         |  
+| simplenetv1_small_m2_05(5.78 MB) |     1.5m     | 61.67 / 83.488  |      69.31 / 88.195        |  
 
 SimpleNet performs very decently, it outperforms VGGNet, variants of ResNet and MobileNets(1-3)   
 and its pretty fast as well! and its all using plain old CNN!.  
@@ -48,65 +51,65 @@ Small variants of simplenet consistently achieve high performance/accuracy:
 
 |       model                       | samples_per_sec   |  param_count  | top1   | top5   |
 |:----------------------------------| :--------------:  | :-----------: | :--:   | :---:  |  
-|mobilenetv3_small_050              |     3035.37       | 1.59          | 57.89  | 80.194 |
-|**simplenetv1_small_m1_05**            |     2839.35         | 1.51          | **60.89**|**82.978**|
-|lcnet_050                          |     2683.57       | 1.88          | 63.1   | 84.382 |
-|**simplenetv1_small_m2_05**            |     2340.51       | 1.51          |**61.524**|**83.432**|
-|mobilenetv3_small_075              |     1781.14       | 2.04          | 65.242 | 85.438 |
-|tf_mobilenetv3_small_075           |     1674.31       | 2.04          | 65.714 | 86.134 |
-|**simplenetv1_small_m1_075**           |     1524.64       | 3.29          |**67.764**|**87.66** |
-|tf_mobilenetv3_small_minimal_100   |     1308.27       | 2.04          | 62.908 | 84.234 |
-|**simplenetv1_small_m2_075**           |     1264.33       | 3.29          |**68.15** |**87.762**|
-|mobilenetv3_small_100              |     1263.23       | 2.54          | 67.656 | 87.634 |
-|tf_mobilenetv3_small_100           |     1220.08       | 2.54          | 67.924 | 87.664 |
-|mnasnet_small                      |     1085.15       | 2.03          | 66.206 | 86.508 |
-|mobilenetv2_050                    |     848.38        | 1.97          | 65.942 | 86.082 |
-|dla46_c                            |     531.0         | 1.3           | 64.866 | 86.294 |
-|dla46x_c                           |     318.32        | 1.07          | 65.97  | 86.98  |
-|dla60x_c                           |     298.59        | 1.32          | 67.892 | 88.426 |
+|simplenetv1_small_m1_05            |     3100.26       | 1.51          | 61.122 | 82.988 |
+|mobilenetv3_small_050              |     3082.85       | 1.59          | 57.89  | 80.194 |
+|lcnet_050                          |     2713.02       | 1.88          | 63.1   | 84.382 |
+|simplenetv1_small_m2_05            |     2536.16       | 1.51          | 61.67  | 83.488 |
+|mobilenetv3_small_075              |     1793.42       | 2.04          | 65.242 | 85.438 |
+|tf_mobilenetv3_small_075           |     1689.53       | 2.04          | 65.714 | 86.134 |
+|simplenetv1_small_m1_075           |     1626.87       | 3.29          | 67.784 | 87.718 |
+|tf_mobilenetv3_small_minimal_100   |     1316.91       | 2.04          | 62.908 | 84.234 |
+|simplenetv1_small_m2_075           |     1313.6        | 3.29          | 68.506 | 88.15  |
+|mobilenetv3_small_100              |     1261.09       | 2.54          | 67.656 | 87.634 |
+|tf_mobilenetv3_small_100           |     1213.03       | 2.54          | 67.924 | 87.664 |
+|mnasnet_small                      |     1089.33       | 2.03          | 66.206 | 86.508 |
+|mobilenetv2_050                    |     857.66        | 1.97          | 65.942 | 86.082 |
+|dla46_c                            |     537.08        | 1.3           | 64.866 | 86.294 |
+|dla46x_c                           |     323.03        | 1.07          | 65.97  | 86.98  |
+|dla60x_c                           |     301.71        | 1.32          | 67.892 | 88.426 |
 
 and this is a sample for larger models: simplenet variants outperform many newer architecures.  
 
-|            model                  |  samples_per_sec | param_count   |  top1  |  top5  |
-|:----------------------------------| :--------------: | :-----------: | :--:   | :---:  |  
-| vit_tiny_r_s16_p8_224             |     1882.23      |   6.34        | 71.792 | 90.822 |
-| simplenetv1_small_m1_075          |     1516.74      |   3.29        | 67.764 | 87.660 |
-| simplenetv1_small_m2_075          |     1260.89      |   3.29        | 68.150 | 87.762 |
-| simplenetv1_5m_m1                 |     1107.70      |   5.75        | 71.370 | 90.100 |
-| deit_tiny_patch16_224             |      991.41      |   5.72        | 72.172 | 91.114 |
-| resnet18                          |      876.92      |  11.69        | 69.744 | 89.082 |
-| simplenetv1_5m_m2                 |      835.17      |   5.75        | 71.936 | 90.300 |
-| crossvit_9_240                    |      602.13      |   8.55        | 73.960 | 91.968 |
-| vit_base_patch32_224_sam          |      571.37      |  88.22        | 73.694 | 91.010 |
-| tinynet_b                         |      530.15      |   3.73        | 74.976 | 92.184 |
-| resnet26                          |      524.36      |  16.00        | 75.300 | 92.578 |
-| tf_mobilenetv3_large_075          |      505.13      |   3.99        | 73.436 | 91.344 |
-| resnet34                          |      491.96      |  21.80        | 75.114 | 92.284 |
-| regnetx_006                       |      478.41      |   6.20        | 73.860 | 91.672 |
-| dla34                             |      472.49      |  15.74        | 74.620 | 92.072 |
-| simplenetv1_9m_m1                 |      459.21      |   9.51        | 73.376 | 91.048 |
-| repvgg_b0                         |      455.36      |  15.82        | 75.160 | 92.418 |
-| ghostnet_100                      |      407.03      |   5.18        | 73.974 | 91.460 |
-| tf_mobilenetv3_large_minimal_100  |       406.84     |   3.92        | 72.250 | 90.630 |
-| mobilenetv3_large_100             |      402.08      |   5.48        | 75.766 | 92.544 |
-| simplenetv1_9m_m2                 |      389.94      |   9.51        | 74.170 | 91.614 |
-| tf_mobilenetv3_large_100          |      388.30      |   5.48        | 75.518 | 92.604 |
-| mobilenetv2_100                   |      295.68      |   3.50        | 72.970 | 91.020 |
-| densenet121                       |      293.94      |   7.98        | 75.584 | 92.652 |
-| mnasnet_100                       |      262.25      |   4.38        | 74.658 | 92.112 |
-| vgg11                             |      260.38      | 132.86        | 69.028 | 88.626 |
-| vgg11_bn                          |      248.92      | 132.87        | 70.360 | 89.802 |
-| mobilenetv2_110d                  |      230.80      |   4.52        | 75.038 | 92.184 |
-| efficientnet_lite0                |      224.81      |   4.65        | 75.476 | 92.512 |
-| tf_efficientnet_lite0             |      219.93      |   4.65        | 74.832 | 92.174 |
-| vgg13                             |      154.03      | 133.05        | 69.926 | 89.246 |
-| vgg13_bn                          |      144.39      | 133.05        | 71.594 | 90.376 |
-| vgg16                             |      123.70      | 138.36        | 71.590 | 90.382 |
-| vgg16_bn                          |      117.06      | 138.37        | 73.350 | 91.504 |
-| vgg19                             |      103.71      | 143.67        | 72.366 | 90.870 |
-| vgg19_bn                          |      98.59       | 143.68        | 74.214 | 91.848 |
+|               model               |  samples_per_sec |  param_count  |  top1  |  top5   |
+|:----------------------------------| :--------------: | :-----------: | :----: | :----:  |  
+| simplenetv1_small_m1_075          |     3036.82      |     3.29      | 67.784 | 87.718  |
+| simplenetv1_small_m2_075          |     2589.4       |     3.29      | 68.506 | 88.15   |
+| vit_tiny_r_s16_p8_224             |     2419.27      |     6.34      | 71.792 | 90.822  |
+| simplenetv1_5m_m1                 |     2204.86      |     5.75      | 71.548 | 89.94   |
+| resnet18                          |     1824.39      |     11.69     | 69.744 | 89.082  |
+| simplenetv1_5m_m2                 |     1821.86      |     5.75      | 72.03  | 90.324  |
+| regnetx_006                       |     1710.9       |     6.2       | 73.86  | 91.672  |
+| mobilenetv3_large_100             |     1568.72      |     5.48      | 75.766 | 92.544  |
+| tf_mobilenetv3_large_minimal_100  |     1564.4       |     3.92      | 72.25  | 90.63   |
+| tf_mobilenetv3_large_075          |     1560.84      |     3.99      | 73.436 | 91.344  |
+| ghostnet_100                      |     1447.97      |     5.18      | 73.974 | 91.46   |
+| tinynet_b                         |     1413.59      |     3.73      | 74.976 | 92.184  |
+| tf_mobilenetv3_large_100          |     1396.66      |     5.48      | 75.518 | 92.604  |
+| mnasnet_100                       |     1238.11      |     4.38      | 74.658 | 92.112  |
+| mobilenetv2_100                   |     1158.3       |     3.5       | 72.97  | 91.02   |
+| simplenetv1_9m_m1                 |     1089.47      |     9.51      | 73.792 | 91.486  |
+| resnet34                          |     1071.63      |     21.8      | 75.114 | 92.284  |
+| efficientnet_lite0                |     1020.15      |     4.65      | 75.476 | 92.512  |
+| deit_tiny_patch16_224             |     1007.63      |     5.72      | 72.172 | 91.114  |
+| simplenetv1_9m_m2                 |     933.93       |     9.51      | 74.23  | 91.748  |
+| tf_efficientnet_lite0             |     920.71       |     4.65      | 74.832 | 92.174  |
+| dla34                             |     871.88       |     15.74     | 74.62  | 92.072  |
+| mobilenetv2_110d                  |     867.18       |     4.52      | 75.038 | 92.184  |
+| resnet26                          |     809.01       |     16        | 75.3   | 92.578  |
+| repvgg_b0                         |     788.45       |     15.82     | 75.16  | 92.418  |
+| crossvit_9_240                    |     618.98       |     8.55      | 73.96  | 91.968  |
+| vgg11                             |     602.05       |     132.86    | 69.028 | 88.626  |
+| vgg11_bn                          |     522.94       |     132.87    | 70.36  | 89.802  |
+| vit_base_patch32_224_sam          |     514.09       |     88.22     | 73.694 | 91.01   |
+| densenet121                       |     460.65       |     7.98      | 75.584 | 92.652  |
+| vgg13                             |     373.71       |     133.05    | 69.926 | 89.246  |
+| vgg13_bn                          |     326.26       |     133.05    | 71.594 | 90.376  |
+| vgg16                             |     312.99       |     138.36    | 71.59  | 90.382  |
+| vgg16_bn                          |     276.35       |     138.37    | 73.35  | 91.504  |
+| vgg19                             |     269.28       |     143.67    | 72.366 | 90.87   |
+| vgg19_bn                          |     239.6        |     143.68    | 74.214 | 91.848  |
 
-Benchmark was done using a GTX1080 on Pytorch 1.11 with fp32, nhwc, batchsize of 256, input size = `224x224x3`.   
+Benchmark was done using a GTX1080 on Pytorch 1.11 with fp32, nchw, batchsize of 256, input size = `224x224x3`.   
 For all benchmark results [look here](https://github.com/Coderx7/SimpleNet_Pytorch/tree/master/ImageNet/training_scripts/imagenet_training/results) 
 
 -- The models pretrained weights (pytorch, onnx, jit) can be found in [Release section](https://github.com/Coderx7/SimpleNet_Pytorch/releases)  
