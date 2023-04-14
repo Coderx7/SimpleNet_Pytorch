@@ -53,15 +53,15 @@ Small variants of simplenet consistently achieve high performance/accuracy:
 
 |       model                       | samples_per_sec   |  param_count  | top1   | top5   |
 |:----------------------------------| :--------------:  | :-----------: | :--:   | :---:  |  
-|simplenetv1_small_m1_05            |     3100.26       | 1.51          | 61.122 | 82.988 |
+|**simplenetv1_small_m1_05**        |     3100.26       | **1.51**      | **61.122** | **82.988** |
 |mobilenetv3_small_050              |     3082.85       | 1.59          | 57.89  | 80.194 |
 |lcnet_050                          |     2713.02       | 1.88          | 63.1   | 84.382 |
-|simplenetv1_small_m2_05            |     2536.16       | 1.51          | 61.67  | 83.488 |
+|**simplenetv1_small_m2_05**        |     2536.16       | **1.51**      | **61.67** | **83.488** |
 |mobilenetv3_small_075              |     1793.42       | 2.04          | 65.242 | 85.438 |
 |tf_mobilenetv3_small_075           |     1689.53       | 2.04          | 65.714 | 86.134 |
-|simplenetv1_small_m1_075           |     1626.87       | 3.29          | 67.784 | 87.718 |
+|**simplenetv1_small_m1_075**       |     1626.87       | **3.29**      | **67.784** | **87.718** |
 |tf_mobilenetv3_small_minimal_100   |     1316.91       | 2.04          | 62.908 | 84.234 |
-|simplenetv1_small_m2_075           |     1313.6        | 3.29          | 68.506 | 88.15  |
+|**simplenetv1_small_m2_075**       |     1313.6        | **3.29**      | **68.506** | **88.15**  |
 |mobilenetv3_small_100              |     1261.09       | 2.54          | 67.656 | 87.634 |
 |tf_mobilenetv3_small_100           |     1213.03       | 2.54          | 67.924 | 87.664 |
 |mnasnet_small                      |     1089.33       | 2.03          | 66.206 | 86.508 |
@@ -74,11 +74,11 @@ and this is a sample for larger models: simplenet variants outperform many newer
 
 |               model               |  samples_per_sec |  param_count  |  top1  |  top5   |
 |:----------------------------------| :--------------: | :-----------: | :----: | :----:  |  
-| simplenetv1_small_m1_075          |     2893.91      |     3.29      | 67.784 | 87.718  |
-| simplenetv1_small_m2_075          |     2478.41      |     3.29      | 68.506 | 88.15   |
+| **simplenetv1_small_m1_075**      |     2893.91      |     **3.29**  | **67.784** | **87.718**  |
+| **simplenetv1_small_m2_075**      |     2478.41      |     **3.29**  | **68.506** | **88.15**   |
 | vit_tiny_r_s16_p8_224             |     2337.23      |     6.34      | 71.792 | 90.822  |
-| simplenetv1_5m_m1                 |     2105.06      |     5.75      | 71.548 | 89.94   |
-| simplenetv1_5m_m2                 |     1754.25      |     5.75      | 72.03  | 90.324  |
+| **simplenetv1_5m_m1**             |     2105.06      |     **5.75**  | **71.548** | **89.94**   |
+| **simplenetv1_5m_m2**             |     1754.25      |     **5.75**  | **72.03**  | **90.324**  |
 | resnet18                          |     1750.38      |     11.69     | 69.744 | 89.082  |
 | regnetx_006                       |     1620.25      |     6.2       | 73.86  | 91.672  |
 | mobilenetv3_large_100             |     1491.86      |     5.48      | 75.766 | 92.544  |
@@ -89,11 +89,11 @@ and this is a sample for larger models: simplenet variants outperform many newer
 | tf_mobilenetv3_large_100          |     1325.06      |     5.48      | 75.518 | 92.604  |
 | mnasnet_100                       |     1183.69      |     4.38      | 74.658 | 92.112  |
 | mobilenetv2_100                   |     1101.58      |     3.5       | 72.97  | 91.02   |
-| simplenetv1_9m_m1                 |     1048.91      |     9.51      | 73.792 | 91.486  |
+| **simplenetv1_9m_m1**             |     1048.91      |     **9.51**  | **73.792** | **91.486**  |
 | resnet34                          |     1030.4       |     21.8      | 75.114 | 92.284  |
 | deit_tiny_patch16_224             |     990.85       |     5.72      | 72.172 | 91.114  |
 | efficientnet_lite0                |     977.76       |     4.65      | 75.476 | 92.512  |
-| simplenetv1_9m_m2                 |     900.45       |     9.51      | 74.23  | 91.748  |
+| **simplenetv1_9m_m2**             |     900.45       |     **9.51**  | **74.23**  | **91.748**  |
 | tf_efficientnet_lite0             |     876.66       |     4.65      | 74.832 | 92.174  |
 | dla34                             |     834.35       |     15.74     | 74.62  | 92.072  |
 | mobilenetv2_110d                  |     824.4        |     4.52      | 75.038 | 92.184  |
