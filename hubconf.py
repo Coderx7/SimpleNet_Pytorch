@@ -3,7 +3,7 @@ dependencies = ["torch"]
 
 from torchvision.models import get_model_weights, get_weight
 
-from ImageNet.simplenet import (
+from imagenet.simplenet import (
     simplenet,
     simplenetv1_5m_m1,
     simplenetv1_5m_m2,
