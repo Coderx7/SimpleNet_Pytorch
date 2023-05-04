@@ -404,7 +404,7 @@ def simplenet(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
     return _gen_simplenet(model_variant, num_classes, in_chans, scale, network_idx, mode, pretrained, drop_rates)
 
 
-def remove_network_settings(kwargs: Dict[str, Any]) -> Dict[str, Any]:
+def _remove_network_settings(kwargs: Dict[str, Any]) -> Dict[str, Any]:
     """Removes network related settings passed in kwargs for predefined network configruations below
 
     Returns:
@@ -420,7 +420,7 @@ def simplenet_cifar_310k(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
     that were used in the paper 
     """
     model_variant = "simplenet_cifar_310k"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, network_idx=2, mode=0, pretrained=pretrained, **model_args)
 
 
@@ -429,7 +429,7 @@ def simplenet_cifar_460k(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
     that were used in the paper 
     """
     model_variant = "simplenet_cifar_460k"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, network_idx=3, mode=0, pretrained=pretrained, **model_args)
 
 
@@ -437,7 +437,7 @@ def simplenet_cifar_5m(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
     """The original implementation of simplenet trained on cifar10/100 in caffe.
     """
     model_variant = "simplenet_cifar_5m"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, network_idx=4, mode=0, pretrained=pretrained, **model_args)
 
 
@@ -447,7 +447,7 @@ def simplenet_cifar_5m_extra_pool(pretrained: bool = False, **kwargs: Any) -> Si
     this is just here to be able to load the weights that were trained using this variation still available on the repository. 
     """
     model_variant = "simplenet_cifar_5m_extra_pool"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, network_idx=5, mode=0, pretrained=pretrained, **model_args)
 
 
@@ -463,7 +463,7 @@ def simplenetv1_small_m1_05(pretrained: bool = False, **kwargs: Any) -> SimpleNe
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_small_m1_05"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.5, network_idx=0, mode=1, pretrained=pretrained, **model_args)
 
 
@@ -478,7 +478,7 @@ def simplenetv1_small_m2_05(pretrained: bool = False, **kwargs: Any) -> SimpleNe
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_small_m2_05"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.5, network_idx=0, mode=2, pretrained=pretrained, **model_args)
 
 
@@ -493,7 +493,7 @@ def simplenetv1_small_m1_075(pretrained: bool = False, **kwargs: Any) -> SimpleN
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_small_m1_075"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.75, network_idx=0, mode=1, pretrained=pretrained, **model_args)
 
 
@@ -508,7 +508,7 @@ def simplenetv1_small_m2_075(pretrained: bool = False, **kwargs: Any) -> SimpleN
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_small_m2_075"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.75, network_idx=0, mode=2, pretrained=pretrained, **model_args)
 
 
@@ -523,7 +523,7 @@ def simplenetv1_5m_m1(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_5m_m1"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=0, mode=1, pretrained=pretrained, **model_args)
 
 
@@ -538,7 +538,7 @@ def simplenetv1_5m_m2(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_5m_m2"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=0, mode=2, pretrained=pretrained, **model_args)
 
 
@@ -553,7 +553,7 @@ def simplenetv1_9m_m1(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_9m_m1"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=1, mode=1, pretrained=pretrained, **model_args)
 
 
@@ -568,7 +568,7 @@ def simplenetv1_9m_m2(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_9m_m2"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=1, mode=2, pretrained=pretrained, **model_args)
 
 

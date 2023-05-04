@@ -437,7 +437,7 @@ def simplenet(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
     return _gen_simplenet(model_variant, num_classes, in_chans, scale, network_idx, mode, pretrained, drop_rates)
 
 
-def remove_network_settings(kwargs: Dict[str, Any]) -> Dict[str, Any]:
+def _remove_network_settings(kwargs: Dict[str, Any]) -> Dict[str, Any]:
     """Removes network related settings passed in kwargs for predefined network configruations below
 
     Returns:
@@ -497,7 +497,7 @@ def simplenetv1_small_m1_05(pretrained: bool = False, **kwargs: Any) -> SimpleNe
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_small_m1_05"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.5, network_idx=0, mode=1, pretrained=pretrained, **model_args)
 
 
@@ -513,7 +513,7 @@ def simplenetv1_small_m2_05(pretrained: bool = False, **kwargs: Any) -> SimpleNe
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_small_m2_05"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.5, network_idx=0, mode=2, pretrained=pretrained, **model_args)
 
 
@@ -529,7 +529,7 @@ def simplenetv1_small_m1_075(pretrained: bool = False, **kwargs: Any) -> SimpleN
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_small_m1_075"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.75, network_idx=0, mode=1, pretrained=pretrained, **model_args)
 
 
@@ -545,7 +545,7 @@ def simplenetv1_small_m2_075(pretrained: bool = False, **kwargs: Any) -> SimpleN
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_small_m2_075"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=0.75, network_idx=0, mode=2, pretrained=pretrained, **model_args)
 
 
@@ -561,7 +561,7 @@ def simplenetv1_5m_m1(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_5m_m1"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=0, mode=1, pretrained=pretrained, **model_args)
 
 
@@ -577,7 +577,7 @@ def simplenetv1_5m_m2(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_5m_m2"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=0, mode=2, pretrained=pretrained, **model_args)
 
 
@@ -593,7 +593,7 @@ def simplenetv1_9m_m1(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_9m_m1"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=1, mode=1, pretrained=pretrained, **model_args)
 
 
@@ -609,7 +609,7 @@ def simplenetv1_9m_m2(pretrained: bool = False, **kwargs: Any) -> SimpleNet:
         SimpleNet: a SimpleNet model instance is returned upon successful instantiation. 
     """
     model_variant = "simplenetv1_9m_m2"
-    model_args = remove_network_settings(kwargs)
+    model_args = _remove_network_settings(kwargs)
     return _gen_simplenet(model_variant, scale=1.0, network_idx=1, mode=2, pretrained=pretrained, **model_args)
 
 
