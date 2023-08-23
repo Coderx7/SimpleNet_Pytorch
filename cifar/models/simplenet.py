@@ -297,6 +297,7 @@ class SimpleNet(nn.Module):
             # check to convert any possible integer value to its decimal counterpart.
             custom_dropout = None if custom_dropout is None else float(custom_dropout)
             kernel_size = 3
+            padding = 1
             if layer_type == ['k1']:
                 kernel_size = 1
                 padding = 0 
