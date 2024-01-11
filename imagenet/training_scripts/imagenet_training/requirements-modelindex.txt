@@ -1,2 +1,2 @@
 model-index==0.1.10
-jinja2==2.11.3
+jinja2==3.1.3
