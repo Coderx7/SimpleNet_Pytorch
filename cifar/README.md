@@ -50,9 +50,8 @@ Simply initiate the training like :
 `python3 main.py ./data/cifar.python --dataset cifar10 --arch simplenet_cifar_5m --save_path ./snapshots/simplenet --epochs 540 --batch_size 100 --workers 2`
 
 
-Note 1: the initial learning rate, and optimization policy is hard coded just like caffe.  
-Note 2: for testing the cifar10/100 weights located in the repository, use the `simplenet_cifar_5m_extra_pool` model instead. see [issue #5](https://github.com/Coderx7/SimpleNet_Pytorch/issues/5) for more information. 
-
+Note 1: The initial learning rate, and optimization policy is hard coded just like caffe.  
+Note 2: For testing the cifar10/100 weights located in the repository, use the `simplenet_cifar_5m_extra_pool` model instead. see [issue #5](https://github.com/Coderx7/SimpleNet_Pytorch/issues/5) and [Error loading checkpoint#7](https://github.com/Coderx7/SimpleNet_Pytorch/issues/7#issuecomment-1932491193) for more information.
 
 ## Citation
 If you find SimpleNet useful in your research, please consider citing:
